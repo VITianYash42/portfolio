@@ -33,7 +33,3 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Deployment
 
 Deployed on [Vercel](https://vercel.com). Every push to `main` triggers an automatic production deployment.
-
-## License
-
-MIT
