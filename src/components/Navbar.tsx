@@ -57,10 +57,10 @@ export default function Navbar() {
           {/* Logo */}
           <button
             onClick={() => handleClick("#hero")}
-            className="font-mono text-sm text-white transition-colors hover:text-cyber-green"
+            className="group font-mono text-lg font-bold transition-opacity hover:opacity-80"
           >
             <span className="text-cyber-green">&lt;</span>
-            YS
+            <span className="text-white">YS</span>
             <span className="text-cyber-green"> /&gt;</span>
           </button>
 

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useMousePosition } from "@/hooks/useMousePosition";
 import { PERSONAL } from "@/data/portfolio";
+import SignatureName from "./SignatureName";
 import { FiGithub, FiLinkedin, FiChevronDown } from "react-icons/fi";
 
 const Scene = dynamic(() => import("./three/Scene"), { ssr: false });
@@ -47,15 +48,14 @@ export default function HeroSection() {
           </span>
         </motion.div>
 
-        {/* Name */}
-        <motion.h1
+        {/* Name - Signature Animation */}
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
-          className="glass-text mb-2 text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl"
         >
-          {PERSONAL.name}
-        </motion.h1>
+          <SignatureName name={PERSONAL.name} />
+        </motion.div>
 
         {/* Title */}
         <motion.div
