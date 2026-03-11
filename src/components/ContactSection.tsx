@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { PERSONAL } from "@/data/portfolio";
 import { FiMail, FiGithub, FiLinkedin, FiExternalLink } from "react-icons/fi";
+import InteractiveAvatar from "./InteractiveAvatar";
 
 export default function ContactSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -19,29 +20,42 @@ export default function ContactSection() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,255,65,0.03),transparent_70%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(0,255,65,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,65,0.02)_1px,transparent_1px)] bg-[size:80px_80px]" />
 
-      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-        >
-          <h2 className="mb-6 text-4xl font-bold text-white sm:text-5xl">
-            Let&apos;s <span className="text-cyber-green">Connect</span>
-          </h2>
-          <p className="mb-12 text-lg text-gray-400">
-            I&apos;m always open to discussing new projects, complex challenges,
-            and opportunities to collaborate. Drop me a message and let&apos;s
-            build something impactful.
-          </p>
-        </motion.div>
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
+        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
+          {/* Avatar */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex-shrink-0"
+          >
+            <InteractiveAvatar />
+          </motion.div>
 
-        {/* Contact cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-12 grid gap-4 sm:grid-cols-3"
-        >
+          {/* Contact content */}
+          <div className="flex-1 text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="mb-6 text-4xl font-bold text-white sm:text-5xl">
+                Let&apos;s <span className="text-cyber-green">Connect</span>
+              </h2>
+              <p className="mb-12 text-lg text-gray-400">
+                I&apos;m always open to discussing new projects, complex
+                challenges, and opportunities to collaborate. Drop me a message
+                and let&apos;s build something impactful.
+              </p>
+            </motion.div>
+
+            {/* Contact cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mb-12 grid gap-4 sm:grid-cols-3"
+            >
           <a
             href={`mailto:${PERSONAL.email}`}
             className="group flex flex-col items-center gap-3 rounded-xl border border-gray-800/50 bg-[#0d1117] p-6 transition-all duration-300 hover:border-cyber-green/30 hover:shadow-[0_0_30px_rgba(0,255,65,0.05)]"
@@ -106,6 +120,8 @@ export default function ContactSection() {
             <FiExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
         </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );
