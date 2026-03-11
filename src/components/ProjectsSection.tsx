@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { PROJECTS, CONTRIBUTIONS } from "@/data/portfolio";
 import { FiGithub, FiExternalLink, FiArrowRight } from "react-icons/fi";
+import MagicRings from "./MagicRings";
 import type { Project, Contribution } from "@/data/portfolio";
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
@@ -61,10 +62,35 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           rotateY: springRotateY,
           transformStyle: "preserve-3d",
         }}
-        className="project-card relative overflow-hidden rounded-2xl border border-gray-800/60 bg-[#0d1117] p-8 transition-[border-color] duration-500 hover:border-gray-700/80"
+        className="project-card relative w-full h-full overflow-hidden rounded-2xl border border-gray-800/60 bg-[#0d1117] transition-[border-color] duration-500 hover:border-gray-700/80"
         data-cursor="pointer"
       >
-        {/* Glare overlay */}
+        {/* Layer 0: Magic Rings WebGL background */}
+        <div className="absolute inset-0 z-0 h-full w-full opacity-60 pointer-events-auto">
+          <MagicRings
+            color="#00ff41"
+            colorTwo="#00aaff"
+            opacity={1}
+            followMouse
+            ringCount={5}
+            speed={1.2}
+            attenuation={12}
+            lineThickness={2.5}
+            baseRadius={0.25}
+            radiusStep={0.08}
+            scaleRate={0.1}
+            noiseAmount={0.08}
+            ringGap={1.5}
+            fadeIn={0.7}
+            fadeOut={0.5}
+            mouseInfluence={0.15}
+            hoverScale={1.15}
+            parallax={0.04}
+            clickBurst
+          />
+        </div>
+
+        {/* Layer 1: Glare overlay */}
         <motion.div
           className="pointer-events-none absolute inset-0 z-20 rounded-2xl"
           style={{
@@ -72,7 +98,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             background: `radial-gradient(350px circle at ${isHovered ? "var(--mouse-x, 50%)" : "50%"} ${isHovered ? "var(--mouse-y, 50%)" : "50%"}, rgba(255,255,255,0.18), transparent 60%)`,
           }}
         />
-        {/* Glow effect on hover */}
+
+        {/* Layer 2: Glow effect on hover */}
         <div
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           style={{
@@ -82,13 +109,14 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
         {/* Top accent line */}
         <div
-          className="absolute left-0 top-0 h-[2px] w-full transition-all duration-500"
+          className="absolute left-0 top-0 h-[2px] w-full transition-all duration-500 z-10"
           style={{
             background: `linear-gradient(90deg, transparent, ${project.accentColor}${isHovered ? "80" : "30"}, transparent)`,
           }}
         />
 
-        <div className="relative z-10">
+        {/* Layer 3: Content foreground */}
+        <div className="relative z-10 flex w-full h-full flex-col p-8 bg-black/40 backdrop-blur-sm pointer-events-none">
           {/* Header */}
           <div className="mb-4 flex items-start justify-between">
             <div>
@@ -102,7 +130,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 {project.subtitle}
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 pointer-events-auto">
               <a
                 href={project.githubUrl}
                 target="_blank"

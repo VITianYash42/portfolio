@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import LoadingScreen from "@/components/LoadingScreen";
 import CustomCursor from "@/components/CustomCursor";
+import GlobalSpotlight from "@/components/GlobalSpotlight";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -26,6 +27,15 @@ export default function Home() {
       </AnimatePresence>
 
       <CustomCursor />
+
+      {/* Fixed noise grain texture */}
+      <div
+        className="noise-overlay pointer-events-none fixed inset-0"
+        style={{ zIndex: -10 }}
+      />
+
+      {/* Mouse-tracking spotlight glow */}
+      <GlobalSpotlight />
 
       {!isLoading && (
         <>
