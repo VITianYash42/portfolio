@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useMousePosition } from "@/hooks/useMousePosition";
 import { PERSONAL } from "@/data/portfolio";
 import SignatureName from "./SignatureName";
+import TerminalTypewriter from "./TerminalTypewriter";
 import { FiGithub, FiLinkedin, FiChevronDown } from "react-icons/fi";
 
 const Scene = dynamic(() => import("./three/Scene"), { ssr: false });
@@ -57,14 +58,14 @@ export default function HeroSection() {
           <SignatureName name={PERSONAL.name} />
         </motion.div>
 
-        {/* Title */}
+        {/* Title — Terminal Typewriter */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="mb-4 font-mono text-lg text-cyber-green sm:text-xl lg:text-2xl"
+          className="mb-4"
         >
-          &lt; {PERSONAL.title} /&gt;
+          <TerminalTypewriter />
         </motion.div>
 
         {/* Subtitle */}
