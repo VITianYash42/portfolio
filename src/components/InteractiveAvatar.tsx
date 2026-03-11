@@ -5,7 +5,83 @@ import { motion, useSpring } from "framer-motion";
 
 const springConfig = { stiffness: 100, damping: 18, mass: 0.6 };
 
-export default function InteractiveAvatar() {
+export type Expression = 'neutral' | 'hello' | 'email' | 'github' | 'linkedin' | 'instagram' | 'discord' | 'twitter';
+
+// Tween for SVG d-attribute morphing (prevents spring overshoot → no twisted paths)
+const pathT = { type: "tween" as const, duration: 0.25, ease: "easeInOut" as const };
+// Spring for numeric properties (opacity, ry, scale, etc.)
+const exprT = { type: "spring" as const, stiffness: 300, damping: 22 };
+
+// All SVG paths use identical command structure: M x y Q cx cy x y
+// Matching structure is critical for smooth Framer Motion interpolation
+const expr = {
+  mouth: {
+    neutral:   "M 139 232 Q 150 236 161 232",
+    hello:     "M 132 229 Q 150 245 168 229",
+    email:     "M 138 232 Q 151 239 162 231",
+    github:    "M 140 233 Q 149 237 161 231",
+    linkedin:  "M 139 232 Q 152 238 161 230",
+    instagram: "M 138 232 Q 150 236 162 232",
+    discord:   "M 133 230 Q 150 246 167 230",
+    twitter:   "M 141 232 Q 150 228 159 232",
+  },
+  lowerLip: {
+    neutral:   "M 142 235 Q 150 239 158 235",
+    hello:     "M 136 236 Q 150 248 164 236",
+    email:     "M 141 235 Q 151 242 159 234",
+    github:    "M 143 236 Q 149 239 158 235",
+    linkedin:  "M 142 235 Q 152 241 158 234",
+    instagram: "M 141 235 Q 150 239 159 235",
+    discord:   "M 136 236 Q 150 250 164 236",
+    twitter:   "M 144 234 Q 150 239 156 234",
+  },
+  leftBrow: {
+    neutral:   "M 108 172 Q 124 166 140 170",
+    hello:     "M 108 166 Q 124 157 140 164",
+    email:     "M 108 171 Q 124 164 140 169",
+    github:    "M 108 175 Q 124 172 140 177",
+    linkedin:  "M 108 172 Q 124 166 140 170",
+    instagram: "M 108 170 Q 124 164 140 168",
+    discord:   "M 108 166 Q 124 157 140 164",
+    twitter:   "M 108 168 Q 124 160 140 166",
+  },
+  rightBrow: {
+    neutral:   "M 160 170 Q 176 166 192 172",
+    hello:     "M 160 164 Q 176 157 192 166",
+    email:     "M 160 169 Q 176 163 192 171",
+    github:    "M 160 177 Q 176 172 192 175",
+    linkedin:  "M 160 168 Q 176 162 192 170",
+    instagram: "M 160 168 Q 176 164 192 170",
+    discord:   "M 160 164 Q 176 157 192 166",
+    twitter:   "M 160 166 Q 176 160 192 168",
+  },
+  eyeRy: {
+    neutral: 8, hello: 9, email: 8, github: 5, linkedin: 8, instagram: 8, discord: 1, twitter: 8,
+  },
+  mouthOpenRx: {
+    neutral: 0, hello: 14, email: 0, github: 0, linkedin: 0, instagram: 0, discord: 14, twitter: 6,
+  },
+  mouthOpenRy: {
+    neutral: 0, hello: 9, email: 0, github: 0, linkedin: 0, instagram: 0, discord: 9, twitter: 5,
+  },
+  mouthOpenOp: {
+    neutral: 0, hello: 1, email: 0, github: 0, linkedin: 0, instagram: 0, discord: 1, twitter: 0.85,
+  },
+  teethOp: {
+    neutral: 0, hello: 0.95, email: 0, github: 0, linkedin: 0, instagram: 0, discord: 0.9, twitter: 0,
+  },
+  lowerLipOp: {
+    neutral: 0.2, hello: 0, email: 0.2, github: 0.2, linkedin: 0.2, instagram: 0.2, discord: 0, twitter: 0,
+  },
+  sunglassOp: {
+    neutral: 0, hello: 0, email: 0, github: 0, linkedin: 0, instagram: 0.92, discord: 0, twitter: 0,
+  },
+  happyEyeOp: {
+    neutral: 0, hello: 0, email: 0, github: 0, linkedin: 0, instagram: 0, discord: 1, twitter: 0,
+  },
+};
+
+export default function InteractiveAvatar({ expression = 'neutral' }: { expression?: Expression }) {
   const [mouseNorm, setMouseNorm] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -118,20 +194,55 @@ export default function InteractiveAvatar() {
             opacity="0.2"
           />
 
-          {/* Mouth - fuller lips */}
-          <path
-            d="M 139 232 Q 150 237 161 232"
-            fill="none"
-            stroke="#8a5040"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          {/* Lower lip */}
-          <path
-            d="M 141 236 Q 150 241 159 236"
-            fill="#9a6050"
-            opacity="0.25"
-          />
+          {/* === BULLETPROOF MOUTH RENDERING === */}
+          
+          {/* 1. Closed Mouths (Neutral, Email, Github, etc. - Morphing works fine here) */}
+          <motion.g
+            initial={{ opacity: 1 }}
+            animate={{ opacity: (expression === 'hello' || expression === 'discord') ? 0 : 1 }}
+            transition={{ duration: 0.15 }}
+          >
+            <motion.path
+              fill="none" stroke="#8a5040" strokeWidth={2.5} strokeLinecap="round"
+              animate={{ d: expr.mouth[expression] }} transition={pathT}
+            />
+            <motion.path
+              fill="#9a6050"
+              animate={{ d: expr.lowerLip[expression], opacity: expr.lowerLipOp[expression] }} transition={pathT}
+            />
+          </motion.g>
+
+          {/* 2. The 'Hello' Mouth (Wide smile with top teeth) */}īīī
+          <motion.g
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{
+              opacity: expression === 'hello' ? 1 : 0,
+              scale: expression === 'hello' ? 1 : 0.8
+            }}
+            transition={exprT}
+            style={{ originX: "150px", originY: "235px" }}
+          >
+            {/* Dark cavity */}
+            <path d="M 130 232 Q 150 258 170 232 Z" fill="#2a0e0e" />
+            {/* Top teeth */}
+            <path d="M 130 232 Q 150 242 170 232 Z" fill="#ffffff" />
+          </motion.g>
+
+          {/* 3. The 'Discord' Mouth (Happy open D shape with tongue hint) */}
+          <motion.g
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{
+              opacity: expression === 'discord' ? 1 : 0,
+              scale: expression === 'discord' ? 1 : 0.8
+            }}
+            transition={exprT}
+            style={{ originX: "150px", originY: "235px" }}
+          >
+            {/* Dark cavity */}
+            <path d="M 134 232 Q 150 255 166 232 Z" fill="#2a0e0e" />
+            {/* Cute tongue at the bottom */}
+            <path d="M 142 245 Q 150 240 158 245 Q 150 255 142 245 Z" fill="#c85a5a" />
+          </motion.g>
 
           {/* Very subtle chin stubble */}
           <ellipse cx="150" cy="250" rx="18" ry="10" fill="#5a4020" opacity="0.06" />
@@ -148,32 +259,94 @@ export default function InteractiveAvatar() {
 
         {/* === EYES === */}
         <motion.g id="eyes" style={{ x: eyesX, y: eyesY }}>
-          {/* Left eye - smaller, narrower */}
-          <ellipse cx="124" cy="188" rx="12" ry="8" fill="white" />
-          <circle cx="126" cy="188" r="5.5" fill="#2c1a0e" />
-          <circle cx="127" cy="187" r="2.8" fill="#0d0d0d" />
-          <circle cx="129" cy="186" r="1.5" fill="white" opacity="0.9" />
-
-          {/* Right eye - smaller, narrower */}
-          <ellipse cx="176" cy="188" rx="12" ry="8" fill="white" />
-          <circle cx="178" cy="188" r="5.5" fill="#2c1a0e" />
-          <circle cx="179" cy="187" r="2.8" fill="#0d0d0d" />
-          <circle cx="181" cy="186" r="1.5" fill="white" opacity="0.9" />
-
-          {/* Eyebrows - thicker, straighter, masculine */}
-          <path
-            d="M 108 172 Q 124 164 140 170"
-            fill="none"
-            stroke="#111"
-            strokeWidth="3.5"
-            strokeLinecap="round"
+          {/* Left eye */}
+          <motion.ellipse
+            cx={124} cy={188} rx={12}
+            fill="white"
+            animate={{
+              ry: expr.eyeRy[expression],
+              opacity: expression === 'instagram' ? 0 : 1,
+            }}
+            transition={exprT}
           />
-          <path
-            d="M 160 170 Q 176 164 192 172"
+          <motion.circle
+            cx={126} cy={188} r={5.5} fill="#2c1a0e"
+            animate={{ opacity: expression === 'discord' || expression === 'instagram' ? 0 : 1 }}
+            transition={exprT}
+          />
+          <motion.circle
+            cx={127} cy={187} r={2.8} fill="#0d0d0d"
+            animate={{ opacity: expression === 'discord' || expression === 'instagram' ? 0 : 1 }}
+            transition={exprT}
+          />
+          <motion.circle
+            cx={129} cy={186} r={1.5} fill="white"
+            animate={{ opacity: expression === 'discord' || expression === 'instagram' ? 0 : 0.9 }}
+            transition={exprT}
+          />
+
+          {/* Right eye */}
+          <motion.ellipse
+            cx={176} cy={188} rx={12}
+            fill="white"
+            animate={{
+              ry: expr.eyeRy[expression],
+              opacity: expression === 'instagram' ? 0 : 1,
+            }}
+            transition={exprT}
+          />
+          <motion.circle
+            cx={178} cy={188} r={5.5} fill="#2c1a0e"
+            animate={{ opacity: expression === 'discord' || expression === 'instagram' ? 0 : 1 }}
+            transition={exprT}
+          />
+          <motion.circle
+            cx={179} cy={187} r={2.8} fill="#0d0d0d"
+            animate={{ opacity: expression === 'discord' || expression === 'instagram' ? 0 : 1 }}
+            transition={exprT}
+          />
+          <motion.circle
+            cx={181} cy={186} r={1.5} fill="white"
+            animate={{ opacity: expression === 'discord' || expression === 'instagram' ? 0 : 0.9 }}
+            transition={exprT}
+          />
+
+          {/* Happy eye arcs (discord ^^) */}
+          <motion.path
+            d="M 114 190 Q 124 180 134 190"
+            fill="none"
+            stroke="#2c1a0e"
+            strokeWidth={3}
+            strokeLinecap="round"
+            animate={{ opacity: expr.happyEyeOp[expression] }}
+            transition={exprT}
+          />
+          <motion.path
+            d="M 166 190 Q 176 180 186 190"
+            fill="none"
+            stroke="#2c1a0e"
+            strokeWidth={3}
+            strokeLinecap="round"
+            animate={{ opacity: expr.happyEyeOp[expression] }}
+            transition={exprT}
+          />
+
+          {/* Eyebrows */}
+          <motion.path
             fill="none"
             stroke="#111"
-            strokeWidth="3.5"
+            strokeWidth={3.5}
             strokeLinecap="round"
+            animate={{ d: expr.leftBrow[expression] }}
+            transition={pathT}
+          />
+          <motion.path
+            fill="none"
+            stroke="#111"
+            strokeWidth={3.5}
+            strokeLinecap="round"
+            animate={{ d: expr.rightBrow[expression] }}
+            transition={pathT}
           />
         </motion.g>
 
@@ -248,6 +421,20 @@ export default function InteractiveAvatar() {
             stroke="#8a5a30"
             strokeWidth="1"
             opacity="0.2"
+          />
+
+          {/* Sunglasses overlay (instagram) */}
+          <motion.rect
+            x={100} y={176} width={38} height={28} rx={6}
+            fill="#111"
+            animate={{ opacity: expr.sunglassOp[expression] }}
+            transition={exprT}
+          />
+          <motion.rect
+            x={162} y={176} width={38} height={28} rx={6}
+            fill="#111"
+            animate={{ opacity: expr.sunglassOp[expression] }}
+            transition={exprT}
           />
         </motion.g>
 

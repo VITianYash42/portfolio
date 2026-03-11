@@ -40,6 +40,9 @@ export const PERSONAL = {
   github: "https://github.com/VITianYash42",
   linkedin: "https://www.linkedin.com/in/yashsinghal979/",
   codeforces: "https://codeforces.com/profile/YashSinghal42",
+  instagram: "https://www.instagram.com/yeah_shhh_/",
+  discord: "https://discord.com/users/1260276042346532917",
+  twitter: "https://x.com/dyno_playz_yt",
   contributions: "700+",
 } as const;
 
