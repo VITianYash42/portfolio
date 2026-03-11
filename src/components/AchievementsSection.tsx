@@ -42,7 +42,7 @@ const typeColors: Record<string, { border: string; bg: string; text: string; glo
 
 export default function AchievementsSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const isInView = useInView(sectionRef, { once: false, margin: "-100px" });
 
   return (
     <section
@@ -81,7 +81,7 @@ export default function AchievementsSection() {
                   key={achievement.id}
                   initial={{ opacity: 0, x: isLeft ? -40 : 40, y: 20 }}
                   whileInView={{ opacity: 1, x: 0, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
+                  viewport={{ once: false, amount: 0.1 }}
                   transition={{ duration: 0.6, delay: i * 0.1 }}
                   className={`relative flex items-center gap-6 md:gap-0 ${
                     isLeft ? "md:flex-row" : "md:flex-row-reverse"

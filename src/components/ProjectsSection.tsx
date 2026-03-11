@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { PROJECTS, CONTRIBUTIONS } from "@/data/portfolio";
 import { FiGithub, FiExternalLink, FiArrowRight } from "react-icons/fi";
 import type { Project, Contribution } from "@/data/portfolio";
@@ -10,6 +10,15 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const glareX = useMotionValue(50);
+  const glareY = useMotionValue(50);
+  const glareOpacity = useMotionValue(0);
+
+  const springRotateX = useSpring(rotateX, { stiffness: 300, damping: 30 });
+  const springRotateY = useSpring(rotateY, { stiffness: 300, damping: 30 });
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -17,24 +26,52 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     cardRef.current.style.setProperty("--mouse-x", `${x}%`);
     cardRef.current.style.setProperty("--mouse-y", `${y}%`);
+
+    // 3D tilt: map 0-100 to -8 to 8 degrees
+    rotateY.set(((x - 50) / 50) * 8);
+    rotateX.set(((50 - y) / 50) * 8);
+    glareX.set(x);
+    glareY.set(y);
+    glareOpacity.set(0.15);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    rotateX.set(0);
+    rotateY.set(0);
+    glareOpacity.set(0);
   };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: false, amount: 0.1 }}
       transition={{ duration: 0.7, delay: index * 0.15 }}
       className="group"
+      style={{ perspective: 800 }}
     >
-      <div
+      <motion.div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="project-card relative overflow-hidden rounded-2xl border border-gray-800/60 bg-[#0d1117] p-8 transition-all duration-500 hover:border-gray-700/80"
+        onMouseLeave={handleMouseLeave}
+        style={{
+          rotateX: springRotateX,
+          rotateY: springRotateY,
+          transformStyle: "preserve-3d",
+        }}
+        className="project-card relative overflow-hidden rounded-2xl border border-gray-800/60 bg-[#0d1117] p-8 transition-[border-color] duration-500 hover:border-gray-700/80"
         data-cursor="pointer"
       >
+        {/* Glare overlay */}
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-20 rounded-2xl"
+          style={{
+            opacity: glareOpacity,
+            background: `radial-gradient(350px circle at ${isHovered ? "var(--mouse-x, 50%)" : "50%"} ${isHovered ? "var(--mouse-y, 50%)" : "50%"}, rgba(255,255,255,0.18), transparent 60%)`,
+          }}
+        />
         {/* Glow effect on hover */}
         <div
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -119,7 +156,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -138,7 +175,7 @@ function ContributionCard({
       rel="noopener noreferrer"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      viewport={{ once: false, amount: 0.1 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group block rounded-xl border border-gray-800/50 bg-[#0d1117] p-6 transition-all duration-300 hover:border-cyber-purple/30 hover:shadow-[0_0_30px_rgba(191,0,255,0.05)]"
       data-cursor="pointer"
@@ -169,7 +206,7 @@ function ContributionCard({
 
 export default function ProjectsSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const isInView = useInView(sectionRef, { once: false, margin: "-100px" });
 
   return (
     <section
@@ -208,7 +245,7 @@ export default function ProjectsSection() {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 0.8 }}
           className="mb-10"
         >

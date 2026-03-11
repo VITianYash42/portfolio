@@ -19,22 +19,29 @@
   }
 }
 
-/* Smooth scrollbar */
+/* Cyber scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #050508;
+  background: #0f1520;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1a2332;
+  background: #00cc33;
   border-radius: 3px;
+  transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #00ff41;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #00cc33 #0f1520;
 }
 
 /* Hide scrollbar utility */

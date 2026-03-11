@@ -69,9 +69,9 @@ const skillCategories = [
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const isInView = useInView(sectionRef, { once: false, margin: "-100px" });
   const skillsRef = useRef<HTMLDivElement>(null);
-  const skillsInView = useInView(skillsRef, { once: true, margin: "-50px" });
+  const skillsInView = useInView(skillsRef, { once: false, margin: "-50px" });
 
   return (
     <section

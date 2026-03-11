@@ -9,7 +9,7 @@ import InteractiveAvatar, { type Expression } from "./InteractiveAvatar";
 
 export default function ContactSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const isInView = useInView(sectionRef, { once: false, margin: "-100px" });
   const [hoverState, setHoverState] = useState<Expression>('neutral');
 
   return (
